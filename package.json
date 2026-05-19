@@ -1,0 +1,33 @@
+{
+  "name": "spin_wheel_game",
+  "version": "1.0.0",
+  "description": "Design and implement a real-time multiplayer spin wheel game system. Users can create spin wheels, join them by paying an entry fee, and compete for prize pools. The system must handle concurrent users, ensure fair coin distribution, and provide real-time updates to all participants.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sudip-kumar-prasad/spin_wheel_game.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/sudip-kumar-prasad/spin_wheel_game/issues"
+  },
+  "homepage": "https://github.com/sudip-kumar-prasad/spin_wheel_game#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
