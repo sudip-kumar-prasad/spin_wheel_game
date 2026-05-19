@@ -47,6 +47,22 @@ export const initializeWheel = async (req, res) => {
   }
 };
 
+export const getActiveWheel = async (req, res) => {
+  try {
+    const activeWheel = await SpinWheel.findOne({
+      status: { $in: ['waiting', 'in_progress'] }
+    });
+    
+    if (!activeWheel) {
+      return res.status(404).json({ message: 'No active wheel found' });
+    }
+    
+    return res.status(200).json(activeWheel);
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error });
+  }
+};
+
 export const startWheelManually = async (req, res) => {
   try {
     const { wheelId, adminId } = req.body;

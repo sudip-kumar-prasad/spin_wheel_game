@@ -80,6 +80,24 @@ function updateUI() {
             adminControls.classList.add('hidden');
             playerControls.classList.remove('hidden');
         }
+
+        fetchActiveWheel();
+    }
+}
+
+async function fetchActiveWheel() {
+    try {
+        const res = await fetch('/api/spin-wheels/active');
+        if (res.ok) {
+            const data = await res.json();
+            activeWheel = data;
+            updateWheelUI();
+        } else {
+            activeWheel = null;
+            updateWheelUI();
+        }
+    } catch (error) {
+        console.error('Error fetching active wheel', error);
     }
 }
 
