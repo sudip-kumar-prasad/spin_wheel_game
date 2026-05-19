@@ -119,9 +119,10 @@ export const joinWheel = async (req, res) => {
     user.coinBalance -= wheel.entryFee;
     await user.save();
 
-    const config = await Config.findOne();
+    let config = await Config.findOne();
     if (!config) {
-      return res.status(500).json({ message: 'Configuration missing' });
+      config = new Config();
+      await config.save();
     }
 
     const winnerShare = (wheel.entryFee * config.winnerPoolPercentage) / 100;
