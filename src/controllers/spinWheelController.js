@@ -1,6 +1,7 @@
 import SpinWheel from '../models/SpinWheel.js';
 import User from '../models/User.js';
 import Config from '../models/Config.js';
+import Transaction from '../models/Transaction.js';
 
 export const initializeWheel = async (req, res) => {
   try {
@@ -112,12 +113,23 @@ export const joinWheel = async (req, res) => {
       return res.status(400).json({ message: 'User already joined this spin wheel' });
     }
 
-    if (user.coinBalance < wheel.entryFee) {
-      return res.status(400).json({ message: 'Insufficient coin balance' });
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: userId, coinBalance: { $gte: wheel.entryFee } },
+      { $inc: { coinBalance: -wheel.entryFee } },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(400).json({ message: 'Insufficient coin balance or concurrent update failed' });
     }
 
-    user.coinBalance -= wheel.entryFee;
-    await user.save();
+    await Transaction.create({
+      userId: user.id,
+      spinWheelId: wheel.id,
+      amount: wheel.entryFee,
+      type: 'debit',
+      description: 'Spin Wheel Entry Fee'
+    });
 
     let config = await Config.findOne();
     if (!config) {

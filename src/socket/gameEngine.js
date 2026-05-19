@@ -30,10 +30,12 @@ export const startGameEngine = (io) => {
         await wheel.save();
         
         for (const p of wheel.participants) {
-          const user = await User.findById(p.userId);
+          const user = await User.findOneAndUpdate(
+            { _id: p.userId },
+            { $inc: { coinBalance: wheel.entryFee } },
+            { new: true }
+          );
           if (user) {
-            user.coinBalance += wheel.entryFee;
-            await user.save();
             await Transaction.create({
               userId: user.id,
               spinWheelId: wheel.id,
@@ -102,12 +104,18 @@ export const startGameEngine = (io) => {
       wheel.winnerId = winner.userId;
       await wheel.save();
 
-      const winnerUser = await User.findById(winner.userId);
-      const adminUser = await User.findById(wheel.adminId);
+      const winnerUser = await User.findOneAndUpdate(
+        { _id: winner.userId },
+        { $inc: { coinBalance: wheel.winnerPool } },
+        { new: true }
+      );
+      const adminUser = await User.findOneAndUpdate(
+        { _id: wheel.adminId },
+        { $inc: { coinBalance: wheel.adminPool } },
+        { new: true }
+      );
 
       if (winnerUser) {
-        winnerUser.coinBalance += wheel.winnerPool;
-        await winnerUser.save();
         await Transaction.create({
           userId: winnerUser.id,
           spinWheelId: wheel.id,
@@ -118,8 +126,6 @@ export const startGameEngine = (io) => {
       }
 
       if (adminUser) {
-        adminUser.coinBalance += wheel.adminPool;
-        await adminUser.save();
         await Transaction.create({
           userId: adminUser.id,
           spinWheelId: wheel.id,
