@@ -6,7 +6,8 @@ export const createUser = async (req, res) => {
     
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      // Mock login: just return the existing user
+      return res.status(200).json(existingUser);
     }
 
     const user = new User({
