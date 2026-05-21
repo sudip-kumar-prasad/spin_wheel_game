@@ -2,11 +2,12 @@
   "name": "spin_wheel_game",
   "version": "1.0.0",
   "description": "Design and implement a real-time multiplayer spin wheel game system. Users can create spin wheels, join them by paying an entry fee, and compete for prize pools. The system must handle concurrent users, ensure fair coin distribution, and provide real-time updates to all participants.",
-  "main": "index.js",
+  "main": "backend/src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "test": "node --test backend/src/tests/spinWheel.test.js",
+    "start": "node backend/src/index.js",
+    "dev": "nodemon backend/src/index.js",
+    "dev:full": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\""
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "mongoose": "^9.6.2",
-    "socket.io": "^4.8.3"
+    "socket.io": "^4.8.3",
+    "concurrently": "^8.2.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
