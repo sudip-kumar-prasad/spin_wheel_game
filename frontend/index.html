@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roxstar - Spin Wheel System</title>
+    <link rel="stylesheet" href="/src/style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Unified User Auth Overlay Modal -->
+    <div id="auth-modal" class="auth-overlay-backdrop">
+        <div class="auth-modal-card">
+            <span class="auth-modal-logo">Roxstar</span>
+            <p class="auth-modal-subtitle">Login to enter the telemetry system</p>
+            <input type="text" id="username-input" class="auth-input-field" placeholder="Username" value="Alex_Rox88">
+            <select id="role-input" class="auth-select-field">
+                <option value="admin">Administrator / GM</option>
+                <option value="user" selected>Standard Player</option>
+            </select>
+            <button id="btn-create-user" class="btn-auth-submit">Initialize Session</button>
+        </div>
+    </div>
+
+    <!-- App Main Frame -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-container">
+                <span class="logo-text">Roxstar</span>
+            </div>
+            
+            <nav class="header-nav" id="header-nav-tabs">
+                <span class="nav-tab active" data-tab="dashboard">Game Master</span>
+                <span class="nav-tab" data-tab="spin">Play Arena</span>
+            </nav>
+            
+            <div class="header-right">
+                <div class="coins-pill">
+                    <span>$</span>
+                    <span id="current-coins">1,000</span>
+                    <span>Coins</span>
+                </div>
+                
+                <button class="icon-button" id="btn-logout" title="Switch User / Logout">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+                
+                <div class="avatar-container" id="header-profile-btn">
+                    <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&q=80" alt="Avatar" class="avatar-image" id="header-avatar-img">
+                </div>
+            </div>
+        </header>
+
+        <!-- -------------------------------------------------------------------
+             VIEW 1: SYSTEM OVERVIEW (ADMIN DASHBOARD / GAME MASTER)
+             ------------------------------------------------------------------- -->
+        <main class="view-section" id="view-dashboard">
+            <!-- ADMIN DASHBOARD VIEW (Visible only for admin role) -->
+            <div id="admin-dashboard-view">
+                <div class="page-title-section">
+                    <h1 class="page-title">System Overview</h1>
+                    <p class="page-subtitle">Real-time telemetry and game master controls.</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    
+                    <!-- Left panel: Revenue & Chart -->
+                    <div class="dashboard-left">
+                        <section class="glass-panel">
+                            <div class="panel-header">
+                                <span class="panel-title">Real-Time Revenue Pools</span>
+                                <span class="live-indicator">Live</span>
+                            </div>
+                            
+                            <!-- Mini cards inside panel -->
+                            <div class="revenue-pools">
+                                <div class="pool-metric-card">
+                                    <span class="pool-metric-title">Winner Pool</span>
+                                    <span class="pool-metric-value" id="dash-winner-pool">0.0k</span>
+                                    <div class="pool-bar-chart">
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar active"></div>
+                                        <div class="bar active"></div>
+                                        <div class="bar"></div>
+                                    </div>
+                                </div>
+                                <div class="pool-metric-card">
+                                    <span class="pool-metric-title">Admin Pool</span>
+                                    <span class="pool-metric-value" id="dash-admin-pool">0.0k</span>
+                                    <div class="pool-bar-chart">
+                                        <div class="bar active"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar active"></div>
+                                    </div>
+                                </div>
+                                <div class="pool-metric-card">
+                                    <span class="pool-metric-title">App Pool</span>
+                                    <span class="pool-metric-value" id="dash-app-pool">0.0k</span>
+                                    <div class="pool-bar-chart">
+                                        <div class="bar"></div>
+                                        <div class="bar active"></div>
+                                        <div class="bar"></div>
+                                        <div class="bar active"></div>
+                                        <div class="bar"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Gorgeous glow line chart SVG -->
+                            <div class="revenue-chart-container">
+                                <svg class="chart-svg" viewBox="0 0 600 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <!-- Pink gradient -->
+                                        <linearGradient id="pinkGrad" x1="0" y1="0" x2="0" y2="240" gradientUnits="userSpaceOnUse">
+                                            <stop offset="0%" stop-color="#e879f9" stop-opacity="0.25"/>
+                                            <stop offset="100%" stop-color="#e879f9" stop-opacity="0"/>
+                                        </linearGradient>
+                                        <!-- Pink glow filter -->
+                                        <filter id="pinkGlow" x="-10%" y="-10%" width="120%" height="120%">
+                                            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#e879f9" flood-opacity="0.4"/>
+                                        </filter>
+                                    </defs>
+                                    
+                                    <!-- Grid Lines -->
+                                    <line x1="0" y1="200" x2="600" y2="200" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+                                    <line x1="0" y1="150" x2="600" y2="150" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+                                    <line x1="0" y1="100" x2="600" y2="100" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+                                    <line x1="0" y1="50" x2="600" y2="50" stroke="rgba(255, 255, 255, 0.03)" stroke-width="1"/>
+
+                                    <!-- Projection dashed line (cyan) -->
+                                    <path d="M 0 200 Q 150 200, 300 150 T 600 120" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4 4" opacity="0.65"/>
+                                    
+                                    <!-- Total Revenue glow area -->
+                                    <path d="M 0 195 C 100 205, 120 180, 200 150 C 300 110, 420 130, 600 100 L 600 240 L 0 240 Z" fill="url(#pinkGrad)"/>
+                                    
+                                    <!-- Total Revenue curve path (pink) -->
+                                    <path d="M 0 195 C 100 205, 120 180, 200 150 C 300 110, 420 130, 600 100" fill="none" stroke="#e879f9" stroke-width="3" filter="url(#pinkGlow)"/>
+                                </svg>
+                            </div>
+                            
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <div class="legend-color total"></div>
+                                    <span>Winner Pool Growth</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color target"></div>
+                                    <span>Projection Goal</span>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Right panel: Controls -->
+                    <div class="dashboard-right">
+                        <!-- Game master controls -->
+                        <section class="glass-panel" style="margin-bottom: 1.5rem;">
+                            <div class="panel-header">
+                                <span class="panel-title">Active Wheel Lifecycle</span>
+                                <span style="color: var(--primary); font-size: 0.85rem;"><i class="fa-solid fa-bahai"></i></span>
+                            </div>
+                            
+                            <div class="game-control-details">
+                                <div class="ctrl-row">
+                                    <span class="ctrl-label">Current Wheel ID</span>
+                                    <span class="ctrl-value wheel-id" id="dash-wheel-id">None</span>
+                                </div>
+                                <div class="ctrl-row" style="margin-top: 0.5rem; align-items: flex-end;">
+                                    <span class="ctrl-value active-status" id="dash-wheel-status">INACTIVE</span>
+                                    <span class="ctrl-value" id="dash-wheel-timer" style="font-family: var(--font-heading); color: var(--text-muted); font-size: 1rem;">00:00:00</span>
+                                </div>
+                            </div>
+
+                            <div class="control-actions-grid">
+                                <button class="btn-game-master start" id="dash-btn-start">
+                                    <i class="fa-solid fa-play"></i> Start Wheel
+                                </button>
+                                <button class="btn-game-master abort" id="dash-btn-abort">
+                                    <i class="fa-solid fa-ban"></i> Abort / Refund
+                                </button>
+                            </div>
+                        </section>
+
+                        <!-- Create new wheel -->
+                        <section class="glass-panel">
+                            <div class="panel-header">
+                                <span class="panel-title">Deploy New Spin Wheel</span>
+                            </div>
+                            
+                            <div class="form-input-group">
+                                <span class="form-label">Entry Fee (Coins)</span>
+                                <div class="form-input-wrapper">
+                                    <span class="form-input-icon"><i class="fa-solid fa-coins"></i></span>
+                                    <input type="number" class="form-text-input" id="dash-input-fee" value="50" min="1">
+                                </div>
+                            </div>
+
+                            <div class="slider-container">
+                                <div class="form-label" style="display:flex; justify-content:space-between;">
+                                    <span>Winner Split Pool %</span>
+                                    <span id="dash-label-winner" style="color: var(--primary); font-weight:700;">80%</span>
+                                </div>
+                                <input type="range" class="custom-range-slider" id="dash-slider-winner" min="50" max="85" value="80">
+                                <div class="slider-header-vals">
+                                    <span>MIN 50%</span>
+                                    <span>MAX 85%</span>
+                                </div>
+                            </div>
+
+                            <div class="split-inputs-row">
+                                <div>
+                                    <span class="form-label">Admin Split %</span>
+                                    <input type="number" class="form-sub-input" id="dash-input-admin" value="10" readonly>
+                                </div>
+                                <div>
+                                    <span class="form-label">App Split %</span>
+                                    <input type="number" class="form-sub-input" id="dash-input-app" value="10" readonly>
+                                </div>
+                            </div>
+
+                            <button class="btn-deploy-action" id="dash-btn-deploy">Deploy Wheel</button>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Bottom panel: Audit Logs -->
+                <section class="glass-panel logs-section-wrapper">
+                    <div class="panel-header">
+                        <span class="panel-title">Audit Ledger & Transaction Logs</span>
+                    </div>
+                    <div class="logs-table-card">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Event Description</th>
+                                    <th>Actor / Origin</th>
+                                    <th>Impact Value</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dash-logs-body">
+                                <tr>
+                                    <td class="time-col">--:--:--</td>
+                                    <td>No events logged yet.</td>
+                                    <td class="origin-col">SYSTEM</td>
+                                    <td class="impact-col positive">--</td>
+                                    <td><span class="status-badge staged">Idle</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+            <!-- PLAYER DASHBOARD VIEW (Visible only for player user role) -->
+            <div id="player-dashboard-view" class="hidden">
+                <div class="page-title-section">
+                    <h1 class="page-title">Player Stats & Ledger</h1>
+                    <p class="page-subtitle">Your personal gameplay activity, earnings telemetry, and historical balance updates.</p>
+                </div>
+
+                <!-- 4 Metrics Cards Grid -->
+                <div class="player-stats-grid">
+                    <div class="pool-metric-card" style="border-color: rgba(6, 182, 212, 0.2);">
+                        <span class="pool-metric-title">Games Played</span>
+                        <span class="pool-metric-value" id="player-games-played">0</span>
+                        <div class="pool-bar-chart">
+                            <div class="bar active" style="background: var(--secondary)"></div>
+                            <div class="bar active" style="background: var(--secondary)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="pool-metric-card" style="border-color: rgba(232, 121, 249, 0.2);">
+                        <span class="pool-metric-title">Games Won</span>
+                        <span class="pool-metric-value" id="player-games-won">0</span>
+                        <div class="pool-bar-chart">
+                            <div class="bar active" style="background: var(--primary)"></div>
+                            <div class="bar active" style="background: var(--primary)"></div>
+                            <div class="bar active" style="background: var(--primary)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                        </div>
+                    </div>
+
+                    <div class="pool-metric-card" style="border-color: rgba(255, 215, 0, 0.25);">
+                        <span class="pool-metric-title">Coins Earned</span>
+                        <span class="pool-metric-value" id="player-coins-earned">0</span>
+                        <div class="pool-bar-chart">
+                            <div class="bar active" style="background: var(--accent-gold)"></div>
+                            <div class="bar active" style="background: var(--accent-gold)"></div>
+                            <div class="bar active" style="background: var(--accent-gold)"></div>
+                            <div class="bar active" style="background: var(--accent-gold)"></div>
+                            <div class="bar" style="background: rgba(255, 255, 255, 0.05)"></div>
+                        </div>
+                    </div>
+
+                    <div class="pool-metric-card" id="player-profit-loss-card" style="border-color: rgba(255, 255, 255, 0.1);">
+                        <span class="pool-metric-title">Net Profit / Loss</span>
+                        <span class="pool-metric-value" id="player-profit-loss">0</span>
+                        <span id="player-profit-loss-badge" class="status-badge" style="position: absolute; bottom: 1.25rem; right: 1.25rem; font-size: 0.75rem;">--</span>
+                    </div>
+                </div>
+
+                <!-- Personal Transaction Logs -->
+                <section class="glass-panel logs-section-wrapper" style="margin-top: 2rem;">
+                    <div class="panel-header">
+                        <span class="panel-title">My Ledger History</span>
+                        <span style="color: var(--secondary); font-size: 0.85rem;"><i class="fa-solid fa-receipt"></i> Personal Transactions</span>
+                    </div>
+                    <div class="logs-table-card">
+                        <table class="logs-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Transaction Description</th>
+                                    <th>Type</th>
+                                    <th>Amount Impact</th>
+                                </tr>
+                            </thead>
+                            <tbody id="player-logs-body">
+                                <tr>
+                                    <td class="time-col">--:--:--</td>
+                                    <td>No transactions logged yet. Play a game to view ledger updates!</td>
+                                    <td>--</td>
+                                    <td class="impact-col positive">--</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <!-- -------------------------------------------------------------------
+             VIEW 2: SPIN WHEEL (LOBBY & ELIMINATION PLAY AREA)
+             ------------------------------------------------------------------- -->
+        <main class="view-section hidden" id="view-spin">
+            
+            <!-- SUBVIEW A: PLAY LOBBY SCREEN (SCREEN 2) -->
+            <div class="spin-grid" id="lobby-subview">
+                
+                <!-- Left panel: Pool Details & Recent wins -->
+                <div class="spin-left-col">
+                    <section class="glass-panel">
+                        <div class="panel-header" style="margin-bottom: 0.75rem;">
+                            <span class="panel-title"><i class="fa-solid fa-trophy" style="color:var(--accent-gold); margin-right:4px;"></i> Cumulative Pools</span>
+                        </div>
+                        
+                        <div class="sidebar-pool-box">
+                            <span class="sidebar-pool-label gold-star">Winner Pool</span>
+                            <span class="sidebar-pool-value gold" id="lobby-winner-pool">0</span>
+                        </div>
+                        <div class="sidebar-pool-box" style="margin-top:0.75rem;">
+                            <span class="sidebar-pool-label">Admin Pool</span>
+                            <span class="sidebar-pool-value" id="lobby-admin-pool">0</span>
+                        </div>
+                        <div class="sidebar-pool-box" style="margin-top:0.75rem;">
+                            <span class="sidebar-pool-label" style="color:var(--secondary);">Required Entry Fee</span>
+                            <span class="sidebar-pool-value cyan" id="lobby-entry-fee">0 Coins</span>
+                        </div>
+                    </section>
+
+                    <section class="glass-panel">
+                        <div class="panel-header">
+                            <span class="panel-title"><i class="fa-solid fa-clock-rotate-left"></i> Game Lifecycle Info</span>
+                        </div>
+                        
+                        <div style="font-size:0.85rem; color:var(--text-muted); line-height:1.6;">
+                            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text-main);">Auto-Start:</strong> The wheel automatically spins after 3 minutes.</p>
+                            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text-main);">Min Players:</strong> Minimum 3 players required to start.</p>
+                            <p style="margin-bottom:0.75rem;"><strong style="color:var(--text-main);">Refund policy:</strong> If less than 3 players join within 3 minutes, the wheel aborts and all entry fees are refunded instantly.</p>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Center Panel: The gorgeous glowing Neon Wheel -->
+                <div class="spin-center-col">
+                    <div class="wheel-component-wrapper">
+                        <!-- Neon top arrow pointer -->
+                        <div class="replica-wheel-pointer"></div>
+                        
+                        <!-- High Fidelity Conic Sectors Spin Wheel -->
+                        <div class="exact-replica-wheel is-spinning" id="play-wheel-sector"></div>
+                        
+                        <!-- Internal Digital Hub -->
+                        <div class="replica-wheel-inner-hub">
+                            <span class="replica-countdown-title">Auto-Starts</span>
+                            <span class="replica-countdown-val" id="lobby-timer-clock">03:00</span>
+                            <div class="replica-hub-progress-line"></div>
+                        </div>
+                    </div>
+
+                    <!-- Glowing CTA Join Trigger -->
+                    <button class="btn-join-replica" id="lobby-btn-join">
+                        Join Game <i class="fa-solid fa-bolt"></i> <span id="lobby-btn-fee-val">0</span> Coins
+                    </button>
+                    <span class="lobby-count-subtitle"><span id="lobby-players-count">0</span> Players currently in lobby</span>
+                </div>
+
+                <!-- Right Panel: LIVE Participants -->
+                <section class="glass-panel">
+                    <div class="panel-header">
+                        <span class="panel-title"><i class="fa-solid fa-users"></i> Joined Lobby</span>
+                        <span class="participants-live-badge">Live</span>
+                    </div>
+                    
+                    <div class="participants-list-scroller" id="lobby-participants-box">
+                        <div style="color:var(--text-muted); font-size:0.85rem; text-align:center; padding:2rem 0;">No active spin wheel. Deploy one from Game Master panel.</div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- SUBVIEW B: ACTIVE ELIMINATION SCREEN (SCREEN 3) -->
+            <div class="elimination-grid hidden" id="elimination-subview">
+                
+                <!-- Left panel: Alive lists -->
+                <section class="glass-panel">
+                    <div class="alive-header-row">
+                        <span class="alive-count-txt" id="game-alive-header">Alive (0)</span>
+                        <span class="alive-prize-badge" id="game-prize-badge">Prize: 0 Coins</span>
+                    </div>
+                    
+                    <div class="alive-scroller" id="game-alive-scroller">
+                        <!-- Alive Items -->
+                    </div>
+                </section>
+
+                <!-- Center panel: spinning wheel & system protocol glass popup -->
+                <div class="elimination-center-panel">
+                    
+                    <div class="wheel-component-wrapper">
+                        <div class="replica-wheel-pointer"></div>
+                        <div class="exact-replica-wheel is-spinning" id="game-wheel-sector"></div>
+                    </div>
+
+                    <!-- Overlay protocol alert banner -->
+                    <div class="elimination-protocol-overlay" id="game-protocol-overlay">
+                        <span class="protocol-header">System Protocol</span>
+                        <span class="protocol-action-txt" id="protocol-status-text">Eliminating:</span>
+                        <span class="protocol-eliminated-username" id="protocol-username">Cyber_Punk88</span>
+                        <span class="protocol-skull-icon" id="protocol-skull-tag"><i class="fa-solid fa-skull" style="color: #f87171;"></i></span>
+                    </div>
+
+                    <!-- Bottom ticker banner layout -->
+                    <div class="elimination-bottom-banner">
+                        <div class="banner-left-telemetry">
+                            <span class="banner-live-dot"></span>
+                            <span>Live Elimination Round | Last eliminated: <strong id="game-last-eliminated">None</strong></span>
+                        </div>
+                        <div class="banner-right-ticker">
+                            <span>Next Elimination In <strong id="game-next-sec" style="color:var(--secondary);">7s</strong></span>
+                            <div class="banner-ticker-progress-bar">
+                                <div class="banner-ticker-progress-bar-fill" id="game-ticker-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- Script assets -->
+    <script src="https://cdn.socket.io/4.8.3/socket.io.min.js"></script>
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>
