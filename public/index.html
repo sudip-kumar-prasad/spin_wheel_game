@@ -41,13 +41,41 @@
                     <h3>Admin Controls</h3>
                     <div class="input-group">
                         <input type="number" id="entry-fee" placeholder="Entry Fee (Coins)" value="100" />
-                        <button id="btn-init-wheel" class="btn-secondary">Initialize Spin Wheel</button>
+    <button id="dash-btn-start" class="btn-success">Start Wheel Manually</button>
+<button id="dash-btn-abort" class="btn-danger">Abort Wheel</button>
                     </div>
                 </div>
 
                 <div id="player-controls" class="action-box hidden">
                     <h3>Player Actions</h3>
                     <button id="btn-join-wheel" class="btn-primary">Join Active Wheel (Cost: <span id="display-fee">?</span> 🪙)</button>
+                </div>
+
+                <div id="player-stats-box" class="action-box hidden" style="margin-top: 1.5rem;">
+                    <h3>My Stats</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.75rem;">
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Played</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-top: 0.25rem;" id="player-stats-played">0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Won</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-top: 0.25rem;" id="player-stats-won">0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Earned</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-top: 0.25rem;" id="player-stats-earned">0</div>
+                        </div>
+                        <div style="background: rgba(255,255,255,0.02); padding: 0.5rem; border-radius: 8px; border: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Profit/Loss</div>
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-top: 0.25rem;" id="player-stats-profit">0</div>
+                        </div>
+                    </div>
+                    
+                    <h3 style="margin-top: 1.5rem;">My Activity Logs</h3>
+                    <div id="player-logs-list" style="margin-top: 0.5rem; max-height: 150px; overflow-y: auto; font-size: 0.8rem; border-radius: 8px; background: rgba(0,0,0,0.2); padding: 0.5rem; border: 1px solid var(--glass-border);">
+                        <div style="color: var(--text-muted); text-align: center; padding: 1rem;">No transactions yet.</div>
+                    </div>
                 </div>
             </section>
 
