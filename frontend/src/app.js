@@ -1,6 +1,6 @@
 // High-Fidelity Frontend Orchestration Logic (Aligned with Assessment Requirements)
-const BACKEND_URL = '';
-const socket = io();
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || '';
+const socket = io(BACKEND_URL);
 
 // Local Session State
 let currentUser = null;

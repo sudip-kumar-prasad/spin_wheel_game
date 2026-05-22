@@ -9,7 +9,13 @@ import { startGameEngine } from './socket/gameEngine.js';
 import userRoutes from './routes/userRoutes.js';
 import spinWheelRoutes from './routes/spinWheelRoutes.js';
 
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
+
+const envPath = fs.existsSync(path.join(process.cwd(), 'backend', '.env'))
+  ? path.join(process.cwd(), 'backend', '.env')
+  : path.join(process.cwd(), '.env');
+dotenv.config({ path: envPath });
 
 const app = express();
 const server = http.createServer(app);
@@ -21,7 +27,6 @@ const gameEngine = startGameEngine(io);
 app.set('gameEngine', gameEngine);
 app.set('io', io);
 
-import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);

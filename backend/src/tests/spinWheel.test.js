@@ -18,7 +18,13 @@ import {
 } from '../controllers/spinWheelController.js';
 import { getUserStats } from '../controllers/userController.js';
 
-dotenv.config();
+import fs from 'fs';
+import path from 'path';
+
+const envPath = fs.existsSync(path.join(process.cwd(), 'backend', '.env'))
+  ? path.join(process.cwd(), 'backend', '.env')
+  : path.join(process.cwd(), '.env');
+dotenv.config({ path: envPath });
 
 // Standard Request/Response Mock helper
 const mockResponse = () => {
