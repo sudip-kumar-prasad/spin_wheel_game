@@ -16,7 +16,7 @@ import {
   getConfig,
   updateConfig
 } from '../controllers/spinWheelController.js';
-import { getUserStats } from '../controllers/userController.js';
+import { getUserStats, signupUser, signinUser } from '../controllers/userController.js';
 
 import fs from 'fs';
 import path from 'path';
@@ -445,6 +445,100 @@ describe('Spin Wheel Game System Tests', () => {
       await getUserStats(reqNotFound, resNotFound);
       assert.strictEqual(resNotFound.statusCode, 404);
       assert.strictEqual(resNotFound.body.message, 'User not found');
+    });
+  });
+
+  describe('2.5 Authentication Tests', () => {
+    test('Signup: Should successfully register a new user', async () => {
+      const signupReq = {
+        body: {
+          name: 'Jane Doe',
+          email: 'jane@example.com',
+          password: 'secretpassword123',
+          role: 'user'
+        }
+      };
+      const signupRes = mockResponse();
+      await signupUser(signupReq, signupRes);
+
+      assert.strictEqual(signupRes.statusCode, 201);
+      assert.ok(signupRes.body.username);
+      assert.strictEqual(signupRes.body.name, 'Jane Doe');
+      assert.strictEqual(signupRes.body.email, 'jane@example.com');
+      assert.strictEqual(signupRes.body.role, 'user');
+      assert.strictEqual(signupRes.body.password, undefined); // Should not expose password
+    });
+
+    test('Signup: Should return error if fields are missing', async () => {
+      const signupReq = {
+        body: {
+          email: 'jane@example.com',
+          password: 'secretpassword123'
+        }
+      };
+      const signupRes = mockResponse();
+      await signupUser(signupReq, signupRes);
+
+      assert.strictEqual(signupRes.statusCode, 400);
+      assert.strictEqual(signupRes.body.message, 'Name, email, and password are required');
+    });
+
+    test('Signin: Should successfully sign in with correct credentials', async () => {
+      // First signup the user
+      const signupReq = {
+        body: {
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'mysecurepassword',
+          role: 'admin'
+        }
+      };
+      const signupRes = mockResponse();
+      await signupUser(signupReq, signupRes);
+      assert.strictEqual(signupRes.statusCode, 201);
+
+      // Now sign in
+      const signinReq = {
+        body: {
+          email: 'john@example.com',
+          password: 'mysecurepassword'
+        }
+      };
+      const signinRes = mockResponse();
+      await signinUser(signinReq, signinRes);
+
+      assert.strictEqual(signinRes.statusCode, 200);
+      assert.strictEqual(signinRes.body.email, 'john@example.com');
+      assert.strictEqual(signinRes.body.role, 'admin');
+      assert.strictEqual(signinRes.body.password, undefined);
+    });
+
+    test('Signin: Should reject incorrect password', async () => {
+      // First signup the user
+      const signupReq = {
+        body: {
+          name: 'Bob Smith',
+          email: 'bob@example.com',
+          password: 'password123',
+          role: 'user'
+        }
+      };
+      const signupRes = mockResponse();
+      await signupUser(signupReq, signupRes);
+      assert.strictEqual(signupRes.statusCode, 201);
+
+      // Now sign in with wrong password
+      const signinReq = {
+        body: {
+          email: 'bob@example.com',
+          password: 'wrongpassword'
+        }
+      };
+      const signinRes = mockResponse();
+      await signinUser(signinReq, signinRes);
+
+      assert.strictEqual(signinRes.statusCode, 401);
+      assert.strictEqual(signinRes.body.message, 'Invalid email or password');
     });
   });
 });

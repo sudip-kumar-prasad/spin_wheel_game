@@ -14,13 +14,34 @@
     <div id="auth-modal" class="auth-overlay-backdrop">
         <div class="auth-modal-card">
             <span class="auth-modal-logo">Roxstar</span>
-            <p class="auth-modal-subtitle">Login to enter the telemetry system</p>
-            <input type="text" id="username-input" class="auth-input-field" placeholder="Username" value="Alex_Rox88">
-            <select id="role-input" class="auth-select-field">
-                <option value="admin">Administrator / GM</option>
-                <option value="user" selected>Standard Player</option>
-            </select>
-            <button id="btn-create-user" class="btn-auth-submit">Initialize Session</button>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-signin" data-form="form-signin">Sign In</div>
+                <div class="auth-tab" id="tab-signup" data-form="form-signup">Sign Up</div>
+            </div>
+
+            <!-- Sign In Form -->
+            <div id="form-signin" class="auth-form-container active">
+                <p class="auth-modal-subtitle">Sign in to your Roxstar account</p>
+                <input type="email" id="signin-email" class="auth-input-field" placeholder="Email Address" required>
+                <input type="password" id="signin-password" class="auth-input-field" placeholder="Password" required>
+                <div id="signin-error" class="auth-error-msg" style="display: none;"></div>
+                <button id="btn-signin-submit" class="btn-auth-submit">Sign In</button>
+            </div>
+
+            <!-- Sign Up Form -->
+            <div id="form-signup" class="auth-form-container">
+                <p class="auth-modal-subtitle">Create a new Roxstar account</p>
+                <input type="text" id="signup-name" class="auth-input-field" placeholder="Full Name" required>
+                <input type="email" id="signup-email" class="auth-input-field" placeholder="Email Address" required>
+                <input type="password" id="signup-password" class="auth-input-field" placeholder="Password" required>
+                <select id="signup-role" class="auth-select-field">
+                    <option value="user" selected>Standard Player</option>
+                    <option value="admin">Administrator / GM</option>
+                </select>
+                <div id="signup-error" class="auth-error-msg" style="display: none;"></div>
+                <button id="btn-signup-submit" class="btn-auth-submit">Create Account</button>
+            </div>
         </div>
     </div>
 

@@ -12,9 +12,6 @@ let eliminationCountInterval = null;
 
 // DOM Elements
 const authModal = document.getElementById('auth-modal');
-const usernameInput = document.getElementById('username-input');
-const roleInput = document.getElementById('role-input');
-const btnCreateUser = document.getElementById('btn-create-user');
 const btnLogout = document.getElementById('btn-logout');
 
 const navTabs = document.querySelectorAll('.nav-tab');
@@ -227,38 +224,131 @@ function syncSpinSubview() {
 
 // User Auth Flow
 function setupAuthFlow() {
-    btnCreateUser.addEventListener('click', async () => {
-        const username = usernameInput.value.trim();
-        const role = roleInput.value;
-        if (!username) return alert('Enter a valid username');
+    // Tab switching logic
+    const tabSignin = document.getElementById('tab-signin');
+    const tabSignup = document.getElementById('tab-signup');
+    const formSignin = document.getElementById('form-signin');
+    const formSignup = document.getElementById('form-signup');
+    const signinError = document.getElementById('signin-error');
+    const signupError = document.getElementById('signup-error');
 
-        try {
-            const res = await fetch(`${BACKEND_URL}/api/users`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, role })
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.message || 'Login failed');
-            
-            currentUser = data;
-            localStorage.setItem('roxstar_session', JSON.stringify(currentUser));
-            
-            // Dismiss Modal
-            authModal.style.display = 'none';
-            
-            // Load User Stats & Info
-            updateUserBalanceUI();
-            addSystemLog('Session initialized successfully', 'Executed', 'SYSTEM_AUTO', '+0.0');
-            
-            // Fetch live wheels
-            await fetchActiveWheel();
-            
-        } catch (err) {
-            console.error('Auth error:', err);
-            alert(`Authentication error: ${err.message}`);
-        }
-    });
+    if (tabSignin && tabSignup && formSignin && formSignup) {
+        tabSignin.addEventListener('click', () => {
+            tabSignin.classList.add('active');
+            tabSignup.classList.remove('active');
+            formSignin.classList.add('active');
+            formSignup.classList.remove('active');
+            if (signinError) signinError.style.display = 'none';
+        });
+
+        tabSignup.addEventListener('click', () => {
+            tabSignup.classList.add('active');
+            tabSignin.classList.remove('active');
+            formSignup.classList.add('active');
+            formSignin.classList.remove('active');
+            if (signupError) signupError.style.display = 'none';
+        });
+    }
+
+    // Sign In Submission
+    const btnSigninSubmit = document.getElementById('btn-signin-submit');
+    if (btnSigninSubmit) {
+        btnSigninSubmit.addEventListener('click', async () => {
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
+
+            if (!email || !password) {
+                if (signinError) {
+                    signinError.textContent = 'Please enter both email and password';
+                    signinError.style.display = 'block';
+                }
+                return;
+            }
+
+            try {
+                if (signinError) signinError.style.display = 'none';
+                const res = await fetch(`${BACKEND_URL}/api/users/signin`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Signin failed');
+
+                currentUser = data;
+                localStorage.setItem('roxstar_session', JSON.stringify(currentUser));
+
+                // Dismiss Modal
+                authModal.style.display = 'none';
+
+                // Load User Stats & Info
+                updateUserBalanceUI();
+                addSystemLog('Session initialized successfully', 'Executed', 'SYSTEM_AUTO', '+0.0');
+
+                // Fetch live wheels
+                await fetchActiveWheel();
+            } catch (err) {
+                console.error('Signin error:', err);
+                if (signinError) {
+                    signinError.textContent = err.message;
+                    signinError.style.display = 'block';
+                } else {
+                    alert(`Authentication error: ${err.message}`);
+                }
+            }
+        });
+    }
+
+    // Sign Up Submission
+    const btnSignupSubmit = document.getElementById('btn-signup-submit');
+    if (btnSignupSubmit) {
+        btnSignupSubmit.addEventListener('click', async () => {
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const role = document.getElementById('signup-role').value;
+
+            if (!name || !email || !password) {
+                if (signupError) {
+                    signupError.textContent = 'All fields are required';
+                    signupError.style.display = 'block';
+                }
+                return;
+            }
+
+            try {
+                if (signupError) signupError.style.display = 'none';
+                const res = await fetch(`${BACKEND_URL}/api/users/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role })
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.message || 'Signup failed');
+
+                currentUser = data;
+                localStorage.setItem('roxstar_session', JSON.stringify(currentUser));
+
+                // Dismiss Modal
+                authModal.style.display = 'none';
+
+                // Load User Stats & Info
+                updateUserBalanceUI();
+                addSystemLog('Session initialized successfully', 'Executed', 'SYSTEM_AUTO', '+0.0');
+
+                // Fetch live wheels
+                await fetchActiveWheel();
+            } catch (err) {
+                console.error('Signup error:', err);
+                if (signupError) {
+                    signupError.textContent = err.message;
+                    signupError.style.display = 'block';
+                } else {
+                    alert(`Authentication error: ${err.message}`);
+                }
+            }
+        });
+    }
 
     // Switch User / Logout button to test multiplayer concurrent states easily!
     btnLogout.addEventListener('click', () => {
@@ -272,6 +362,17 @@ function setupAuthFlow() {
             gmTab.style.display = '';
             gmTab.textContent = 'Game Master';
         }
+
+        // Reset form inputs
+        document.getElementById('signin-email').value = '';
+        document.getElementById('signin-password').value = '';
+        document.getElementById('signup-name').value = '';
+        document.getElementById('signup-email').value = '';
+        document.getElementById('signup-password').value = '';
+        if (signinError) signinError.style.display = 'none';
+        if (signupError) signupError.style.display = 'none';
+        // Go back to signin tab
+        if (tabSignin) tabSignin.click();
     });
 }
 

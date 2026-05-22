@@ -1,6 +1,94 @@
 import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
 import SpinWheel from '../models/SpinWheel.js';
+import crypto from 'crypto';
+
+// Password hashing helpers
+const hashPassword = (password) => {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return `${salt}:${hash}`;
+};
+
+const verifyPassword = (password, storedPassword) => {
+  if (!storedPassword) return false;
+  const parts = storedPassword.split(':');
+  if (parts.length !== 2) return false;
+  const [salt, originalHash] = parts;
+  const hash = crypto.pbkdf2Sync(password, salt, 1000, 64, 'sha512').toString('hex');
+  return hash === originalHash;
+};
+
+export const signupUser = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+    
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+
+    // Generate unique username from name for compatibility
+    let baseUsername = name.trim().replace(/\s+/g, '_');
+    let username = baseUsername;
+    let counter = 1;
+    while (await User.findOne({ username })) {
+      username = `${baseUsername}_${counter}`;
+      counter++;
+    }
+
+    const hashedPassword = hashPassword(password);
+
+    const user = new User({
+      username,
+      name,
+      email,
+      password: hashedPassword,
+      role: role || 'user',
+      coinBalance: 1000
+    });
+
+    await user.save();
+    
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(201).json(userResponse);
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message || error });
+  }
+};
+
+export const signinUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const isMatch = verifyPassword(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid email or password' });
+    }
+
+    const userResponse = user.toObject();
+    delete userResponse.password;
+
+    return res.status(200).json(userResponse);
+  } catch (error) {
+    return res.status(500).json({ message: 'Server error', error: error.message || error });
+  }
+};
 
 export const createUser = async (req, res) => {
   try {
@@ -8,7 +96,6 @@ export const createUser = async (req, res) => {
     
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      // Mock login: just return the existing user
       return res.status(200).json(existingUser);
     }
 
